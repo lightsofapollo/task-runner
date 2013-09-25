@@ -2,6 +2,8 @@ suite('perform', function() {
   var perform = require('../lib/perform'),
       fsPath = require('path');
 
+  var TIMEOUT = 2000;
+
   function fixture(name) {
     return fsPath.join(__dirname, 'fixtures', name);
   }
@@ -14,7 +16,7 @@ suite('perform', function() {
   test('success', function(done) {
     var input = { itsAnObject: { inAnObject: true }};
 
-    perform(fixture('success'), input, function(err, result) {
+    perform(fixture('success'), TIMEOUT, input, function(err, result) {
       assert.ok(!err, 'is successful: ' + err);
       assert.deepEqual(input, result, 'mirrors the data over the wire');
       assert.notEqual(input, result, 'is not a reference');
@@ -23,7 +25,7 @@ suite('perform', function() {
   });
 
   test('sync error (in module)', function(done) {
-    perform(fixture('sync_error_load'), {}, function(err) {
+    perform(fixture('sync_error_load'), TIMEOUT, {}, function(err) {
       assertError(err, 'xxx');
       // verify we have a nice stack
       assert.ok(
@@ -36,7 +38,7 @@ suite('perform', function() {
 
   test('sync error (in run)', function(done) {
     var isClosed = false;
-    var task = perform(fixture('sync_error_run'), {}, function(err) {
+    var task = perform(fixture('sync_error_run'), TIMEOUT, {}, function(err) {
       assertError(err, 'yyy');
       assert.ok(isClosed, 'process is closed');
       // verify we have a nice stack
@@ -53,7 +55,7 @@ suite('perform', function() {
   });
 
   test('async error (passed)', function(done) {
-    perform(fixture('async_error_pass'), {}, function(err) {
+    perform(fixture('async_error_pass'), TIMEOUT, {}, function(err) {
       assertError(err, 'async');
       done();
     });
@@ -61,11 +63,40 @@ suite('perform', function() {
 
   test('async error (uncaught)', function(done) {
     var isClosed = false;
-    var task = perform(fixture('async_error_uncaught'), {}, function(err) {
-      assertError(err, 'uncaught');
-      assert.ok(isClosed, 'task process is closed');
-      done();
+
+    var task = perform(
+      fixture('async_error_uncaught'),
+      TIMEOUT,
+      {},
+      function(err) {
+        assertError(err, 'uncaught');
+        assert.ok(isClosed, 'task process is closed');
+        done();
+      }
+    );
+
+    task.process.on('close', function() {
+      isClosed = true;
     });
+  });
+
+  test('timeout', function(done) {
+    var isClosed;
+
+    var task = perform(
+      fixture('timeout'),
+      10,
+      {},
+      function(err) {
+        assert.ok(err, 'has error');
+        assert.ok(isClosed, 'process has closed');
+        assert.ok(
+          err.message.indexOf('timeout') !== -1,
+          'is a timeout err: ' + err.message
+        );
+        done();
+      }
+    );
 
     task.process.on('close', function() {
       isClosed = true;

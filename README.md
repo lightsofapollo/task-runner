@@ -27,9 +27,14 @@ module.exports = myTask;
 ```js
 var runner = require('isolated-task-runner');
 
-runner.perform('myask', { somedata: true }, function(err, result) {
-  
-});
+runner.perform(
+  'myask', /* module to run: use require.resolve to use npm packages */
+  1000, /* timeout in ms */
+  { somedata: true }, /* options to pass to task */
+  function(err, result) {
+    /* result of task */
+  }
+);
 ```
 
 ## Isolation and error handling
