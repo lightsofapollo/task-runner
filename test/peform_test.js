@@ -35,8 +35,10 @@ suite('perform', function() {
   });
 
   test('sync error (in run)', function(done) {
-    perform(fixture('sync_error_run'), {}, function(err) {
+    var isClosed = false;
+    var task = perform(fixture('sync_error_run'), {}, function(err) {
       assertError(err, 'yyy');
+      assert.ok(isClosed, 'process is closed');
       // verify we have a nice stack
       assert.ok(
         err.stack.indexOf('sync_error_run.js:2') !== -1,
@@ -44,12 +46,29 @@ suite('perform', function() {
       );
       done();
     });
+
+    task.process.on('close', function() {
+      isClosed = true;
+    });
   });
 
   test('async error (passed)', function(done) {
     perform(fixture('async_error_pass'), {}, function(err) {
       assertError(err, 'async');
       done();
+    });
+  });
+
+  test('async error (uncaught)', function(done) {
+    var isClosed = false;
+    var task = perform(fixture('async_error_uncaught'), {}, function(err) {
+      assertError(err, 'uncaught');
+      assert.ok(isClosed, 'task process is closed');
+      done();
+    });
+
+    task.process.on('close', function() {
+      isClosed = true;
     });
   });
 });
