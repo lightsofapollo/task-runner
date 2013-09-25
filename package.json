@@ -1,0 +1,29 @@
+{
+  "name": "isolated-task-runner",
+  "version": "0.0.0",
+  "description": "Run invidual tasks on a seperate process",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mozilla-b2g-bot/isolated-task-runner.git"
+  },
+  "keywords": [
+    "tasks",
+    "queue",
+    "subprocess"
+  ],
+  "author": "James Lal [:lightsofapollo]",
+  "license": "Apache2",
+  "bugs": {
+    "url": "https://github.com/mozilla-b2g-bot/isolated-task-runner/issues"
+  },
+  "devDependencies": {
+    "mocha": "~1.13.0"
+  }
+}
