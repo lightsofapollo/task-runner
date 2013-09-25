@@ -22,6 +22,10 @@ suite('serialize_error', function() {
     });
   });
 
+  test('#serialize given null', function() {
+    assert.equal(Errors.serialize(null), null);
+  });
+
   test('#deserialize', function() {
     var subject = Errors.deserialize(Errors.serialize(error));
 
@@ -30,6 +34,10 @@ suite('serialize_error', function() {
     assert.equal(subject.stack, error.stack, '.stack');
     assert.equal(subject.code, error.code, '.code');
     assert.equal(subject.message, error.message, '.message');
+  });
+
+  test('#deserialize given null', function() {
+    assert.equal(Errors.serialize(null), null);
   });
 
 });
