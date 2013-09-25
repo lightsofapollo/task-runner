@@ -81,25 +81,43 @@ suite('perform', function() {
   });
 
   test('timeout', function(done) {
-    var isClosed;
+    var isClosed = false;
 
     var task = perform(
       fixture('timeout'),
       10,
       {},
       function(err) {
-        assert.ok(err, 'has error');
-        assert.ok(isClosed, 'process has closed');
-        assert.ok(
-          err.message.indexOf('timeout') !== -1,
-          'is a timeout err: ' + err.message
-        );
-        done();
+        process.nextTick(function() {
+          assert.ok(err, 'has error');
+          assert.ok(isClosed, 'process has closed');
+          assert.ok(
+            err.message.indexOf('timed out') !== -1,
+            'is a timeout err: ' + err.message
+          );
+          done();
+        });
       }
     );
 
     task.process.on('close', function() {
       isClosed = true;
     });
+  });
+
+  test('unexpected process exit', function(done) {
+    var task = perform(
+      fixture('unexpected_exit'),
+      TIMEOUT,
+      {},
+      function(err) {
+        assert.ok(err, 'passed an error');
+        assert.ok(
+          err.message.indexOf('process unexpected') !== -1,
+          err.message
+        );
+        done();
+      }
+    );
   });
 });
