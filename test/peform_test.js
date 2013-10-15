@@ -16,10 +16,11 @@ suite('perform', function() {
   test('success', function(done) {
     var input = { itsAnObject: { inAnObject: true }};
 
-    perform(fixture('success'), TIMEOUT, input, function(err, result) {
+    perform(fixture('success'), TIMEOUT, input, function(err, result, status) {
       assert.ok(!err, 'is successful: ' + err);
-      assert.deepEqual(input, result, 'mirrors the data over the wire');
-      assert.notEqual(input, result, 'is not a reference');
+      assert.ok(result, 'passes multiple arguments');
+      assert.deepEqual(input, status, 'mirrors the data over the wire');
+      assert.notEqual(input, status, 'is not a reference');
       done();
     });
   });
